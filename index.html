@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>henk — 智能简历管理助手</title>
+    <meta name="description" content="henk 是一款免费的 Android 应用，帮你管理简历、追踪岗位、AI 智能分析，让求职过程井井有条。">
+    <meta property="og:title" content="henk — 智能简历管理助手">
+    <meta property="og:description" content="让你的简历管理像呼吸一样自然。免费 Android 应用，支持 AI 分析、岗位追踪、数据仪表盘。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://henckys188.github.io/henk/">
+    <meta name="theme-color" content="#6C5CE7">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #6C5CE7;
+            --primary-light: #A29BFE;
+            --primary-glow: rgba(108, 92, 231, 0.3);
+            --accent: #00CEC9;
+            --bg-dark: #0F0A2E;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-card-hover: rgba(255, 255, 255, 0.08);
+            --text: #F5F5FF;
+            --text-muted: #B0A8D0;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== Animated background ===== */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-glow .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite alternate;
+        }
+        .bg-glow .orb:nth-child(1) {
+            width: 500px; height: 500px;
+            background: var(--primary);
+            top: -150px; left: -100px;
+            animation-duration: 25s;
+        }
+        .bg-glow .orb:nth-child(2) {
+            width: 400px; height: 400px;
+            background: var(--accent);
+            bottom: -100px; right: -80px;
+            animation-duration: 20s;
+            animation-delay: -5s;
+        }
+        .bg-glow .orb:nth-child(3) {
+            width: 300px; height: 300px;
+            background: #FD79A8;
+            top: 50%; left: 60%;
+            animation-duration: 18s;
+            animation-delay: -10s;
+        }
+        @keyframes orbFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(40px, -60px) scale(1.1); }
+            66%  { transform: translate(-20px, 30px) scale(0.9); }
+            100% { transform: translate(30px, -40px) scale(1.05); }
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Nav ===== */
+        nav {
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .nav-logo .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), #E17055);
+            font-weight: 800;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .nav-version {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+        .hero-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 40%, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto 36px;
+        }
+
+        /* ===== Download button ===== */
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: var(--font);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), #E17055);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 24px var(--primary-glow);
+        }
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 36px var(--primary-glow);
+        }
+        .btn-download:active {
+            transform: translateY(-1px);
+        }
+        .btn-download svg {
+            width: 22px; height: 22px;
+            flex-shrink: 0;
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--text);
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-left: 12px;
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .hero-info {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .hero-info a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        .hero-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== Phone Mockup ===== */
+        .phone-mockup {
+            margin: 60px auto 0;
+            max-width: 280px;
+            position: relative;
+        }
+        .phone-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 19.5;
+            background: #1a1a2e;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.08),
+                0 20px 60px rgba(0,0,0,0.5),
+                0 0 80px var(--primary-glow);
+        }
+        .phone-frame .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: #1a1a2e;
+            border-radius: 0 0 16px 16px;
+            z-index: 2;
+        }
+        .phone-frame .notch::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .phone-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .screenshot-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .screenshot-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+        .screenshot-dots .dot.active {
+            background: var(--primary-light);
+            width: 24px;
+            border-radius: 4px;
+        }
+        .screenshot-dots .dot:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .screenshot-nav {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        /* ===== Features ===== */
+        .features {
+            padding: 80px 0;
+        }
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 48px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+        }
+        .feature-card .icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+        }
+        .feature-card .icon.purple { background: rgba(108,92,231,0.2); }
+        .feature-card .icon.cyan   { background: rgba(0,206,201,0.2); }
+        .feature-card .icon.pink   { background: rgba(253,121,168,0.2); }
+        .feature-card .icon.orange { background: rgba(225,112,85,0.2); }
+        .feature-card .icon.blue   { background: rgba(116,185,255,0.2); }
+        .feature-card .icon.green  { background: rgba(0,200,117,0.2); }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            border-top: 1px solid var(--border-glass);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        footer .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        footer .footer-links a:hover {
+            color: var(--text);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1rem; }
+            .hero-actions { flex-direction: column; }
+            .btn-secondary { margin-left: 0; }
+            .features-grid { grid-template-columns: 1fr; }
+            .screenshot-area { max-width: 240px; }
+        }
+        @media (max-width: 480px) {
+            .hero { padding: 50px 0 40px; }
+            .hero h1 { font-size: 1.8rem; }
+            .btn-download { padding: 14px 24px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background orbs -->
+    <div class="bg-glow">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Nav -->
+    <div class="container">
+        <nav>
+            <a href="#" class="nav-logo">
+                <span class="logo-icon">h</span>
+                henk
+            </a>
+            <span class="nav-version">v2.0.0</span>
+        </nav>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero-tag">✦ 免费 · 开源 · 离线可用</span>
+            <h1>让你的简历管理<br>像呼吸一样自然</h1>
+            <p>henk 是一款本地优先的 Android 应用，帮你整理简历、追踪岗位、用 AI 提取关键标签。全部数据存在本地，无需注册，即装即用。</p>
+
+            <div class="hero-actions">
+                <a href="https://raw.githubusercontent.com/henckys188/henk/main/henk-v2.0.0.apk" class="btn-download" download>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    下载 henk v2.0.0
+                </a>
+                <a href="#features" class="btn-secondary">
+                    功能介绍 ↓
+                </a>
+            </div>
+
+            <p class="hero-info">
+                APK 大小 20.4 MB · 支持 Android 5.0+ ·
+                <a href="https://github.com/henckys188/henk" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
+            </p>
+
+            <!-- Phone Mockup -->
+            <div class="phone-mockup" id="phone-mockup">
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <img id="screenshot-display" src="screenshots/screenshot-1.jpg" alt="henk App 截图">
+                </div>
+                <div class="screenshot-dots">
+                    <button class="dot active" data-index="0" aria-label="截图 1"></button>
+                    <button class="dot" data-index="1" aria-label="截图 2"></button>
+                    <button class="dot" data-index="2" aria-label="截图 3"></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>它能做什么</h2>
+            <div class="features-grid">
+
+                <div class="feature-card">
+                    <div class="icon purple">📄</div>
+                    <h3>简历管理</h3>
+                    <p>支持 PDF / DOCX / TXT 导入，自动解析内容。编辑、搜索、收藏、分类筛选，一切尽在掌握。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon cyan">🤖</div>
+                    <h3>AI 标签提取</h3>
+                    <p>基于 DeepSeek 的智能识别，自动提取技能、经验、学历等关键标签。支持语义搜索，简历再多也能秒级定位。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon orange">🎯</div>
+                    <h3>岗位追踪</h3>
+                    <p>自定义岗位需求，关联匹配的简历，管理招聘阶段。实时跟踪需求人数和已招进度，不再混乱。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon green">📊</div>
+                    <h3>数据仪表盘</h3>
+                    <p>KPI 卡片 + 柱状图 / 饼图 / 折线图，一目了然看透你的简历库和岗位数据。支持按类型、时间段统计。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon pink">🎨</div>
+                    <h3>个性化主题</h3>
+                    <p>10 种预设颜色 + 纯色/渐变切换，还有暗色模式。桌面小部件？也安排上了，看一眼就知道数据。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon blue">🔒</div>
+                    <h3>本地优先</h3>
+                    <p>所有数据存储在 SQLite 本地数据库，无需网络即可使用。你的简历数据，只有你知道。</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="padding: 40px 0 80px; text-align: center;">
+        <div class="container">
+            <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;">准备好了？</h2>
+            <p style="color: var(--text-muted); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto;">
+                下载后打开 APK 即可安装，无注册、无广告、无隐私收集。<br>就是这么纯粹。
+            </p>
+            <a href="https://raw.githubusercontent.com/henckys188/henk/main/henk-v2.0.0.apk" class="btn-download" download>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                立即下载 henk
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/henckys188/henk" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/henckys188/henk/releases" target="_blank" rel="noopener">更新日志</a>
+                <a href="https://github.com/henckys188/henk/issues" target="_blank" rel="noopener">反馈</a>
+            </div>
+            <p>henk v2.0.0 · Made with ⚡ by henckys</p>
+        </div>
+    </footer>
+
+    <!-- Screenshot switcher -->
+    <script>
+        const screenshots = [
+            'screenshots/screenshot-1.jpg',
+            'screenshots/screenshot-2.jpg',
+            'screenshots/screenshot-3.jpg'
+        ];
+        const img = document.getElementById('screenshot-display');
+        const dots = document.querySelectorAll('.screenshot-dots .dot');
+
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                img.src = screenshots[i];
+                dots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
